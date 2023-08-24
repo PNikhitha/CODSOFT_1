@@ -1,0 +1,53 @@
+from sklearn.exceptions import UndefinedMetricWarning
+
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+
+# Sample movie plot summary data (Replace this with your actual dataset)
+data = {
+    'plot_summary': [
+        "A group of rebels fight against an evil empire.",
+        "A young wizard battles dark forces to save the world.",
+        "A love story set in the 19th century.",
+        "A group of friends go on a road trip.",
+        "A detective investigates a murder mystery."
+    ],
+    'genre': ['Sci-Fi', 'Fantasy', 'Romance', 'Adventure', 'Mystery']
+}
+
+# Create a DataFrame from the data
+df = pd.DataFrame(data)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(df['plot_summary'], df['genre'], test_size=0.2, random_state=42)
+
+# Create TF-IDF vectorizer
+vectorizer = TfidfVectorizer(stop_words='english')
+
+# Transform the training and testing data
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+# Create and train the Logistic Regression classifier
+classifier = LogisticRegression()
+classifier.fit(X_train_tfidf, y_train)
+
+# Make predictions on the test set
+y_pred = classifier.predict(X_test_tfidf)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Print classification report
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
